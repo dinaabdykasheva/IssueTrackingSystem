@@ -111,6 +111,8 @@ public class Runner {
         FileWriter.writeToFile("C:\\Users\\Dina_Abdykasheva\\Desktop\\open issues.txt", openIssues);
 
         System.out.println("for git testing");
+
+        System.out.println("for git testing2");
     }
 
 }
