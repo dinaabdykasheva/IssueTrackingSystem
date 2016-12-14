@@ -109,6 +109,8 @@ public class Runner {
         List<Issue> openIssues = IssuesCollectedByStatus.collectIssuesByStatus(allIssues, Status.OPEN);
 
         FileWriter.writeToFile("C:\\Users\\Dina_Abdykasheva\\Desktop\\open issues.txt", openIssues);
+
+        System.out.println("for git testing");
     }
 
 }
