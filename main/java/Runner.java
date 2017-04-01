@@ -1,19 +1,21 @@
+import datareaders.ReadIssueFromDB;
+import datareaders.ReadIssueFromFile;
+import datareaders.ReadIssueFromXML;
 import model.*;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Workbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.DeleteIssue;
 import service.FindIssues;
 import service.IssueComparator;
 import service.IssuesCollectedByStatus;
-import service.exceptions.IssueNotFoundException;
-import service.exceptions.WrongParameterException;
-import service.file.FileWriter;
+import exceptions.IssueNotFoundException;
+import exceptions.WrongParameterException;
+import datawriter.FileWriter;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -21,45 +23,19 @@ import java.util.*;
  */
 public class Runner {
     private static final Logger LOGGER = LoggerFactory.getLogger(Runner.class);
+    private static final String ISSUES_TXT_FILE = "C:\\Users\\Dina_Abdykasheva\\Desktop\\Issues.txt";
+    private static final String ISSUES_XML_FILE = "C:\\Users\\Dina_Abdykasheva\\Desktop\\Issues.xml";
 
-    public static void main(String[] args) throws IOException {
-        FileInputStream file = new FileInputStream("C:\\Users\\Dina_Abdykasheva\\Desktop\\Employee.xls");
-        Workbook workBook = new HSSFWorkbook(file);
-        String firstTesterName = workBook.getSheetAt(0).getRow(0).getCell(0).getStringCellValue();
-        String firstTesterTitle = workBook.getSheetAt(0).getRow(0).getCell(1).getStringCellValue();
-        String secondTesterName = workBook.getSheetAt(0).getRow(1).getCell(0).getStringCellValue();
-        String secondTesterTitle = workBook.getSheetAt(0).getRow(1).getCell(1).getStringCellValue();
-        String firstDevName = workBook.getSheetAt(0).getRow(2).getCell(0).getStringCellValue();
-        String firstDevTitle = workBook.getSheetAt(0).getRow(2).getCell(1).getStringCellValue();
-        String secondDevName = workBook.getSheetAt(0).getRow(3).getCell(0).getStringCellValue();
-        String secondDevTitle = workBook.getSheetAt(0).getRow(3).getCell(1).getStringCellValue();
-        String thirdDevName = workBook.getSheetAt(0).getRow(4).getCell(0).getStringCellValue();
-        String thirdDevTitle = workBook.getSheetAt(0).getRow(4).getCell(1).getStringCellValue();
-        String coordinatorName = workBook.getSheetAt(0).getRow(5).getCell(0).getStringCellValue();
-        String coordinatorTitle = workBook.getSheetAt(0).getRow(5).getCell(1).getStringCellValue();
-        file.close();
+    public static void main(String[] args) throws IOException, SQLException {
 
-        Employee firstTester = new Employee(firstTesterName, firstTesterTitle);
-        Employee secondTester = new Employee(secondTesterName, secondTesterTitle);
-        Employee firstDeveloper = new Employee(firstDevName, firstDevTitle);
-        Employee secondDeveloper = new Employee(secondDevName, secondDevTitle);
-        Employee thirdDeveloper = new Employee(thirdDevName, thirdDevTitle);
-        Employee coordinator = new Employee(coordinatorName, coordinatorTitle);
+        /*Employee employee = new Employee("Dina", "Tester");
 
-
-        Issue epicOne = new Epic(2, "epic one Summary", Priority.MAJOR, Status.CLOSED, "epic one Description", coordinator);
-        Story storyOne =  new Story(3, "story one Summary", Priority.MAJOR, Status.CLOSED, "story one Description", firstTester);
-        Issue bugOne = new Bug(4, "bug one Summary", Priority.MAJOR, Status.RESOLVED, "bug one Description", secondTester);
-        Bug bugTwo = new Bug(7, "bug two Summary", Priority.CRITICAL, Status.RESOLVED, "bug two Description", firstTester);
-        Bug bugThree = new Bug(8, "bug one Summary", Priority.MINOR, Status.RESOLVED, "bug one Description", secondTester);
-        Bug bugFour = new Bug(9, "bug one Summary", Priority.MINOR, Status.READY_FOR_TEST, "bug one Description", secondTester);
-        Bug bugFive = new Bug(10, "bug one Summary", Priority.TRIVIAL, Status.READY_FOR_TEST, "bug one Description", secondTester);
-        Bug bugSix = new Bug(11, "bug one Summary", Priority.MAJOR, Status.REOPENED, "bug one Description", secondTester);
-        Bug bugSeven = new Bug(12, "bug one Summary", Priority.MAJOR, Status.RESOLVED, "bug one Description", secondTester);
-        Bug majorBug = new Bug(13, "Major Bug Summary", Priority.MAJOR, Status.NEW, "Major Bug Description", firstTester);
-        Bug minorBug = new Bug(14, "Minor Bug Summary", Priority.MINOR, Status.NEW, "Minor Bug Description", firstTester);
-        Issue epicTwo = new Issue(5, "Major Epic Summary", Priority.MAJOR, Status.NEW, "Major Epic Description", firstDeveloper);
-        Issue storyTwo = new Issue(6,"Major Story Summary", Priority.MAJOR, Status.NEW, "Major Story Description", firstDeveloper);
+        Issue epicOne = new Epic(2, "epic one Summary", Priority.MAJOR, Status.CLOSED, "epic one Description", employee);
+        Story storyOne =  new Story(3, "story one Summary", Priority.MAJOR, Status.CLOSED, "story one Description", employee);
+        Issue bugOne = new Bug(4, "bug one Summary", Priority.MAJOR, Status.RESOLVED, "bug one Description", employee);
+        Bug bugTwo = new Bug(7, "bug two Summary", Priority.CRITICAL, Status.RESOLVED, "bug two Description", employee);
+        Bug bugThree = new Bug(8, "bug one Summary", Priority.MINOR, Status.RESOLVED, "bug one Description", employee);
+        Bug bugFour = new Bug(9, "bug one Summary", Priority.MINOR, Status.READY_FOR_TEST, "bug one Description", employee);
 
         Set<Issue> allIssues = new HashSet<Issue>();
         allIssues.add(epicOne);
@@ -68,18 +44,6 @@ public class Runner {
         allIssues.add(bugTwo);
         allIssues.add(bugThree);
         allIssues.add(bugFour);
-        allIssues.add(bugFive);
-        allIssues.add(bugSix);
-        allIssues.add(bugSeven);
-        allIssues.add(majorBug);
-        allIssues.add(minorBug);
-        allIssues.add(epicTwo);
-        allIssues.add(storyTwo);
-
-        majorBug.create();
-        minorBug.create();
-        epicTwo.create();
-        storyTwo.create();
 
         Map<String, String> issueReporterMap = new HashMap<String, String>();
         Iterator<Issue> iterator = allIssues.iterator();
@@ -109,6 +73,43 @@ public class Runner {
         List<Issue> openIssues = IssuesCollectedByStatus.collectIssuesByStatus(allIssues, Status.OPEN);
 
         FileWriter.writeToFile("C:\\Users\\Dina_Abdykasheva\\Desktop\\open issues.txt", openIssues);
+
+        ReadIssueFromFile readIssueFromFile = new ReadIssueFromFile(ISSUES_TXT_FILE);
+        try {
+            Issue issue = readIssueFromFile.readIssue(1);
+            System.out.println(issue.toString());
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+        }*/
+
+        ReadIssueFromXML readIssueFromXML = new ReadIssueFromXML(ISSUES_XML_FILE);
+        try {
+            Issue issue = readIssueFromXML.readIssue(1);
+            System.out.println(issue.toString());
+        } catch (NullPointerException e) {
+            System.out.println(e.getMessage());
+        }
+
+        /*Connection connection = null;
+        try {
+            connection = DriverManager.getConnection("jdbc:sqlserver://localhost:1433; databaseName = Employees; user = sa; password = Kassiopeya19");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+        ReadIssueFromDB readIssueFromDB = new ReadIssueFromDB(connection);
+        try {
+            Issue issue = readIssueFromDB.readIssue(2);
+        } catch (NullPointerException e ) {
+            System.out.println(e.getMessage());
+        }
+        try {
+            if (connection != null) {
+                connection.close();
+        }
+        } catch (SQLException e) {}*/
+
+
+
     }
 
 }
