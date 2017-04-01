@@ -28,6 +28,10 @@ public class Issue {
     public Issue() {
     }
 
+    public Issue(int id, String summary, String priority, String status, String description, String reporter) {
+
+    }
+
     public int getId() {
         return id;
     }
@@ -115,5 +119,14 @@ public class Issue {
     @Override
     public int hashCode() {
         return Objects.hash(id, summary, priority, status, description, reporter);
+    }
+
+    public void setPriority(String priority) {
+    }
+
+    public void setStatus(String status) {
+    }
+
+    public void setReporter(String reporter) {
     }
 }

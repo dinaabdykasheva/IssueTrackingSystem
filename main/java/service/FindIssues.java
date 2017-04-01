@@ -1,7 +1,7 @@
 package service;
 
 import model.Issue;
-import service.exceptions.IssueNotFoundException;
+import exceptions.IssueNotFoundException;
 
 import java.util.HashSet;
 import java.util.Iterator;

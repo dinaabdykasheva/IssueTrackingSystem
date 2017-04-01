@@ -1,4 +1,4 @@
-package service.exceptions;
+package exceptions;
 
 /**
  * Created by Dina_Abdykasheva on 12/12/2016.

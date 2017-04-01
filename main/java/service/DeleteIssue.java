@@ -5,8 +5,8 @@ import model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import service.exceptions.IssueNotFoundException;
-import service.exceptions.WrongParameterException;
+import exceptions.IssueNotFoundException;
+import exceptions.WrongParameterException;
 
 import java.util.Iterator;
 import java.util.Set;
